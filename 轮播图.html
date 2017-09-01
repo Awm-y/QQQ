@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>轮播图</title>
+		<style>
+			*{margin: 0; padding: 0;}
+			a{text-decoration: none;}
+			img{border: none;}
+			li{list-style: none;}
+			
+			.box{
+				width: 600px; height: 400px; border: 1px solid red; margin: 100px auto 0;
+				position: relative;
+			}
+			.box ul li{
+				/*z-index 必须要有定位的属性才会起做用，专门用来解决多个平级关系的元素定位后它们的上下层显示关系
+				 后面的值越大越在上面，取值整数*/
+				width: 600px; height: 400px; position:absolute; left: 0; top: 0; z-index: 1;
+			}
+			.pre{
+				width: 50px; height: 50px; display: block; position: absolute; left: 10px; top: 175px;
+				background: #fff;  border-radius: 50%; font-size: 48px; text-align: center; line-height: 40px;
+				opacity: 0.2; z-index: 2; 
+			}
+			.next{
+				width: 50px; height: 50px; display: block; position: absolute; right: 10px; top: 175px;
+				background: #fff;  border-radius: 50%; font-size: 48px; text-align: center; line-height: 40px;
+				opacity: 0.2; z-index: 2;
+			}
+			.box>a:hover{
+				opacity: 0.8;
+			}
+			.number{
+				width: 180px; height: 20px;  z-index: 2;
+				position: absolute; left: 50%; margin-left: -90px; bottom: 10px;
+			}
+			.number span{
+				width: 20px; height: 20px; display: block; font-size: 14px; background: #ccc;
+				margin: 0 5px; text-align: center; line-height: 20px; float: left; border-radius: 50%;
+				cursor:pointer;
+			}
+			.box .number .active{
+				background: yellow;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<ul>
+				<li><a href="#"><img src="imgs/1.jpg"></a></li>
+				<li><a href="#"><img src="imgs/2.jpg"></a></li>
+				<li><a href="#"><img src="imgs/3.jpg"></a></li>
+				<li><a href="#"><img src="imgs/4.jpg"></a></li>
+				<li><a href="#"><img src="imgs/5.jpg"></a></li>
+				<li><a href="#"><img src="imgs/6.jpg"></a></li>
+			</ul>
+			<a href="#" class="pre">&lt;</a>
+			<a href="#" class="next">&gt;</a>
+			<div class="number">
+				<span class="active">1</span>
+				<span>2</span>
+				<span>3</span>
+				<span>4</span>
+				<span>5</span>
+				<span>6</span>
+			</div>
+		</div>
+		
+	</body>
+</html>
+<script src="js/jquery-1.12.3.min.js"></script>
+<script>
+	//大于gt  小于lt 等于eq
+	//选到了等于第0个的元素，计算机的编码为 0123456789 所在咱们所说的第一个就是计算机里的第0个元素
+	//show()表示显示当前元素
+	//siblings()表示当前元素的兄弟
+	//hide() 表示所选元素隐藏
+	$('.box ul li:eq(0)').show().siblings().hide();
+	
+	//封装一个命名函数
+	function paly(){
+		//让li元素等于我当前n的值的时候显示出来，其它兄弟的li隐藏
+		$('.box ul li').eq(n).fadeIn().siblings().fadeOut();
+		//同样，让下面的span等于我当前n的元素去添加类名为active的样式，其它兄弟移除active的样式
+		$('.number span').eq(n).addClass('active').siblings().removeClass('active')
+	};
+
+	//定义一个变量名叫n,初始值为0
+	var n = 0;
+	//定义一个变量名叫timer 先不赋值
+	var timer;
+	//下一张的按钮点击事件
+	//先选择到叫.next的，然后后面接事件，事件具体为一个函数执行，函数格式为function(){这里面写具体要执行的语句}
+	$('.box .next').click(function(){
+		//n++表示自增，每次点击一次不断加上1
+		n++;
+		//判断一下这个n，如果加到大于5了，条件成立执行大括号里面的，把n又变为0
+		if(n > 5){
+			n = 0
+		};
+		paly();
+		
+//		$('body').append('<h1 style="float:left;">'+n+'</h1>')
+	})
+	
+	$('.box .pre').click(function(){
+		n--;
+//		alert(n)
+		if(n < 0){
+			n = 5
+		}
+		paly();
+	})
+//	var a=0;
+//	$(document).click(function(){
+//		
+//		a++;
+//		alert(a)
+//	})
+    //用each()方法去遍历所有的span
+    //可以用一个形参叫index的去接收所有span的索引值
+	$('.number span').each(function(index){
+		//想要获取当前的索引值它的对象一定是   this
+		$(this).click(function(){
+			n = index
+			paly();
+		})
+	})
+
+
+    //同样再封装一个命名函数叫autoPaly
+	function autoPaly(){
+		//把整个定时器赋值给叫刚刚定义好的变量timer
+		//定时器方法后面接时间
+		timer = setInterval(function(){
+	//		alert(1)
+			//n++表示自增，每次点击一次不断加上1
+			n++;
+			//判断一下这个n，如果加到大于5了，条件成立执行大括号里面的，把n又变为0
+			if(n > 5){
+				n = 0
+			};
+			//调用封装的函数
+			paly();
+		},1000)	
+	};
+	
+	//调用封装的函数
+	autoPaly();
+	
+	//hover为鼠标移入和移出两个事件，前面的function(){}为移入，后面的function(){}为移出
+	$('.box').hover(function(){
+		//当鼠标移入时清除定时器
+		clearInterval(timer)
+	},function(){
+		//当鼠标移出时再次调用封装好了的定时器函数
+		autoPaly();
+	})
+
+</script>
